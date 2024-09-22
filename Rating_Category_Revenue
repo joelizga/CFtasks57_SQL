@@ -1,0 +1,12 @@
+Here is an SQL query to find revenue generation by movie ratings and movie categories
+
+SELECT 	rating,
+		CA.name,
+     	SUM (P.amount) AS total_amt_paid
+FROM payment P
+JOIN rental R ON P.rental_id = R.rental_id
+JOIN inventory I ON R.inventory_id = I.inventory_id
+JOIN film F ON I.film_id = F.film_id
+JOIN film_category FC ON F.film_id = FC.film_id
+JOIN category CA ON FC.category_id = CA.category_id
+GROUP BY rating, CA.name
