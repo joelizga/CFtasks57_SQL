@@ -1,0 +1,31 @@
+SQL query to look at movie rentals from India and China
+
+SELECT 	CO.country,
+		F.rating,
+		CA.name,
+		P.amount,
+		COUNT(DISTINCT R.rental_id) AS number_rentals
+FROM payment P
+	JOIN customer CU ON P.customer_id = CU.customer_id
+	JOIN address A ON CU.address_id = A.address_id
+	JOIN city CI ON A.city_id = CI.city_id
+	JOIN country CO ON CI.country_id = CO.country_id
+	JOIN rental R ON P.rental_id = R.rental_id
+	JOIN inventory I ON R.inventory_id = I.inventory_id
+	JOIN film F ON I.film_id = F.film_id
+	JOIN film_category FC ON F.film_id = FC.film_id
+	JOIN category CA ON FC.category_id = CA.category_id
+		WHERE (CO.country) IN
+		(
+		SELECT CO.country
+		FROM payment P
+		JOIN customer CU ON P.customer_id = CU.customer_id
+		JOIN address A ON CU.address_id = A.address_id
+		JOIN city CI ON A.city_id = CI.city_id
+		JOIN country CO ON CI.country_id = CO.country_id
+		GROUP BY CO.country
+		ORDER BY SUM(P.amount) DESC
+		LIMIT 2 
+		)
+GROUP BY CO.country, F.rating, CA.name, P.amount
+ORDER BY P.amount DESC
